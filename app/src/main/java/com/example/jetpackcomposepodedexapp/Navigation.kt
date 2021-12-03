@@ -35,7 +35,7 @@ fun Navigation() {
             //access passed arguments
             val dominantColor = remember {
                 //remember what we passed is color code and its an int, so assign a variable to it
-                var color = it.arguments?.getInt("dominantColor")
+                val color = it.arguments?.getInt("dominantColor")
                 //convert the color hex code to compose color
                 //logic here is "If color !=null color?.let, use the color{Color(it)}, else use white ?: White"
                 color?.let { Color(it) } ?: Color.White
