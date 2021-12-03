@@ -23,3 +23,4 @@ Technologies used
 2. Android
 3. Jetpack compose
 4. Dagger-Hilt
+5. Retrofit
