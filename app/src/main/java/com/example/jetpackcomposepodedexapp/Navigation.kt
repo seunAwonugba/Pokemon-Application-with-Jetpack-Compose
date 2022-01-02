@@ -16,13 +16,13 @@ fun Navigation() {
     val navController = rememberNavController()
 
     //create a navHost
-    NavHost(navController = navController, startDestination = Screens.POKEMON_LIST_SCREEN.route){
-        composable(Screens.POKEMON_LIST_SCREEN.route){
+    NavHost(navController = navController, startDestination = Screens.PokemonListScreen.route){
+        composable(Screens.PokemonListScreen.route){
             PokemonListScreen(navController = navController)
 
         }
         composable(
-            Screens.POKEMON_DETAILS_SCREEN.route + "/{dominantColor}" + "/{pokemonName}" ,
+            Screens.PokemonDetailsScreen.route + "/{dominantColor}" + "/{pokemonName}" ,
             //Note we passing to items as arguments 1. Dominant color, 2. Pokemon name
             arguments = listOf(
                 navArgument("dominantColor"){
