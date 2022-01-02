@@ -1,13 +1,10 @@
 package com.example.jetpackcomposepodedexapp.screens
 
-import android.view.RoundedCorner
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -100,10 +97,50 @@ fun SearchBar(
     }
 }
 
-
-//single pokemon
 @Composable
-fun PokemonInList(
+fun PokemonList(
+    navController: NavController,
+    viewModel: PokemonListViewModel = hiltViewModel()
+) {
+    //first get reference to states defined in the viewmodel
+    val pokemonList by remember {
+        viewModel.pokemonList
+    }
+
+    val endReached by remember {
+        viewModel.endReached
+    }
+
+    val isLoading by remember {
+        viewModel.isLoading
+    }
+
+    val loadError by remember {
+        viewModel.loadError
+    }
+
+    LazyColumn(contentPadding = PaddingValues(16.dp)){
+        val itemCount = if (pokemonList.size % 2 == 0) {
+            pokemonList.size / 2
+        }
+        else{
+            pokemonList.size / 2 + 1
+        }
+
+        items(itemCount){
+            PokemonInRow(rowIndex = it, entries = pokemonList, navController = navController )
+        }
+    }
+}
+
+
+
+
+
+
+        //single pokemon
+@Composable
+fun SinglePokemon(
     pokemonListEntry : PokemonListEntry,
     //want to click on this entry and navigate to the details screen
     navController: NavController,
@@ -175,7 +212,7 @@ fun PokemonInRow(
     Column {
         //inside this column i want rows because we want to display 2 Pokemon's
         Row {
-            PokemonInList(
+            SinglePokemon(
                 pokemonListEntry = entries[rowIndex * 2],
                 navController = navController,
                 modifier = Modifier.weight(1f)
@@ -183,7 +220,7 @@ fun PokemonInRow(
             Spacer(modifier = Modifier.width(16.dp))
 
             if (entries.size >= rowIndex * 2 + 2) {
-                PokemonInList(
+                SinglePokemon(
                     pokemonListEntry = entries[rowIndex * 2 + 1],
                     navController = navController,
                     modifier = Modifier.weight(1f)
