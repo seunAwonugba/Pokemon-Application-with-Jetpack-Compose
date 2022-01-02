@@ -50,6 +50,10 @@ class PokemonListViewModel @Inject constructor(
     var isLoading = mutableStateOf(false)
     var endReached = mutableStateOf(false)
 
+    init {
+        loadingHandler()
+    }
+
     //loads next set of data while making a network call
     fun loadingHandler(){
         viewModelScope.launch {

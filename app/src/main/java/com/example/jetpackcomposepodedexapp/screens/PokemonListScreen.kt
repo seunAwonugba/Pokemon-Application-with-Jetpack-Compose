@@ -27,12 +27,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.annotation.ExperimentalCoilApi
+import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
+import coil.transform.CircleCropTransformation
+import com.example.jetpackcomposepodedexapp.R
 import com.example.jetpackcomposepodedexapp.Screens
 import com.example.jetpackcomposepodedexapp.dataclass.PokemonListEntry
 import com.example.jetpackcomposepodedexapp.viewmodels.list.PokemonListViewModel
-import com.google.accompanist.coil.CoilImage
 
 @Composable
 fun PokemonListScreen(
@@ -55,6 +58,10 @@ fun PokemonListScreen(
             )
             //searchbar
             SearchBar()
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            PokemonList(navController = navController)
 
         }
     }
@@ -128,6 +135,12 @@ fun PokemonList(
         }
 
         items(itemCount){
+            //detect when to paginate
+            //if this is true, we know we have scrolled to the bottom, also check if end is not reached
+            if (it >= itemCount - 1 && !endReached) {
+                viewModel.loadingHandler()
+
+            }
             PokemonInRow(rowIndex = it, entries = pokemonList, navController = navController )
         }
     }
@@ -139,6 +152,7 @@ fun PokemonList(
 
 
         //single pokemon
+@ExperimentalCoilApi
 @Composable
 fun SinglePokemon(
     pokemonListEntry : PokemonListEntry,
@@ -169,28 +183,63 @@ fun SinglePokemon(
         contentAlignment = Center
     ){
         Column {
-            CoilImage(
-                data = ImageRequest.Builder(LocalContext.current)
-                    .data(pokemonListEntry.pokemonImageUrl)
-                    .target{
-                        viewModel.calculateDominantColor(it){ calculatedDominantColor ->
-                            dominantColor = calculatedDominantColor
+            val painter = rememberImagePainter(
+                data = pokemonListEntry.pokemonImageUrl,
+                builder = {
+                    error(R.drawable.error_image)
+                    //place holder can go in here
+                }
+            )
 
+            (painter.state as? ImagePainter.State.Success)
+                ?.let { successState ->
+                    LaunchedEffect(Unit) {
+                        val drawable = successState.result.drawable
+                        viewModel.calculateDominantColor(drawable) { color ->
+                            dominantColor = color
                         }
                     }
-                    .build(),
+                }
+
+            val painterState = painter.state
+            Image(
+                painter = painter,
                 contentDescription = pokemonListEntry.pokemonName,
-                fadeIn = true,
                 modifier = Modifier
-                    .size(120.dp)
-                    .align(CenterHorizontally)
-            ) {
-                //here is used to display a composable while its loading
+                    .size(128.dp)
+                    .align(CenterHorizontally),
+            )
+            if (painterState is ImagePainter.State.Loading){
                 CircularProgressIndicator(
                     color = MaterialTheme.colors.primary,
                     modifier = Modifier.scale(.5f)
                 )
             }
+//
+//            CoilImage(
+//                data = ImageRequest.Builder(LocalContext.current)
+//                    .data(pokemonListEntry.pokemonImageUrl)
+//                    .target{
+//                        viewModel.calculateDominantColor(it){ calculatedDominantColor ->
+//                            dominantColor = calculatedDominantColor
+//
+//                        }
+//                    }
+//                    .build(),
+//                contentDescription = pokemonListEntry.pokemonName,
+//                fadeIn = true,
+//                modifier = Modifier
+//                    .size(120.dp)
+//                    .align(CenterHorizontally)
+//            ) {
+//                //here is used to display a composable while its loading
+//                CircularProgressIndicator(
+//                    color = MaterialTheme.colors.primary,
+//                    modifier = Modifier.scale(.5f)
+//                )
+//            }
+
+
             //below image, display image name
             Text(
                 text = pokemonListEntry.pokemonName,
@@ -203,6 +252,7 @@ fun SinglePokemon(
     }
 }
 
+@ExperimentalCoilApi
 @Composable
 fun PokemonInRow(
     rowIndex : Int,
