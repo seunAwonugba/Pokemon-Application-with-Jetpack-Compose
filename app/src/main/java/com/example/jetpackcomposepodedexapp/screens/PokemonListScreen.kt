@@ -1,9 +1,13 @@
 package com.example.jetpackcomposepodedexapp.screens
 
+import android.view.RoundedCorner
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -14,6 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
@@ -25,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
 import com.example.jetpackcomposepodedexapp.Screens
 import com.example.jetpackcomposepodedexapp.dataclass.PokemonListEntry
@@ -94,6 +100,8 @@ fun SearchBar(
     }
 }
 
+
+//single pokemon
 @Composable
 fun PokemonInList(
     pokemonListEntry : PokemonListEntry,
@@ -114,6 +122,7 @@ fun PokemonInList(
     Box(
         modifier = modifier
             .shadow(5.dp, RoundedCornerShape(10.dp))
+            .clip(RoundedCornerShape(10.dp))
             .background(Brush.verticalGradient(listOf(dominantColor, defaultDominantColor)))
             .clickable {
                 navController.navigate(
@@ -139,13 +148,13 @@ fun PokemonInList(
                     .size(120.dp)
                     .align(CenterHorizontally)
             ) {
-                //this is the box scope where image will load, and display, emit loading first
+                //here is used to display a composable while its loading
                 CircularProgressIndicator(
                     color = MaterialTheme.colors.primary,
                     modifier = Modifier.scale(.5f)
                 )
             }
-            //below image name
+            //below image, display image name
             Text(
                 text = pokemonListEntry.pokemonName,
                 fontSize = 20.sp,
@@ -154,5 +163,37 @@ fun PokemonInList(
             )
 
         }
+    }
+}
+
+@Composable
+fun PokemonInRow(
+    rowIndex : Int,
+    entries: List<PokemonListEntry>,
+    navController: NavController
+){
+    Column {
+        //inside this column i want rows because we want to display 2 Pokemon's
+        Row {
+            PokemonInList(
+                pokemonListEntry = entries[rowIndex * 2],
+                navController = navController,
+                modifier = Modifier.weight(1f)
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+
+            if (entries.size >= rowIndex * 2 + 2) {
+                PokemonInList(
+                    pokemonListEntry = entries[rowIndex * 2 + 1],
+                    navController = navController,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            else {
+                Spacer(modifier = Modifier.weight(1f))
+            }
+
+        }
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
