@@ -5,7 +5,6 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.capitalize
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.palette.graphics.Palette
@@ -51,11 +50,11 @@ class PokemonListViewModel @Inject constructor(
     var endReached = mutableStateOf(false)
 
     init {
-        loadingHandler()
+        paginationLoadingHandler()
     }
 
     //loads next set of data while making a network call
-    fun loadingHandler(){
+    fun paginationLoadingHandler(){
         viewModelScope.launch {
             // before setting result emit loading state
             isLoading.value = true
@@ -88,7 +87,7 @@ class PokemonListViewModel @Inject constructor(
                             "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${number}.png"
                         //construct the data passed to the PokemonListEntry i created
                         PokemonListEntry(
-                            entry.name.capitalize(Locale.ROOT),
+                            entry.name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() },
                             myCalculatedImageUrl,
                             number.toInt()
                         )

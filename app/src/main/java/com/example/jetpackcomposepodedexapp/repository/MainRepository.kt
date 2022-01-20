@@ -26,6 +26,9 @@ class MainRepository @Inject constructor(
             else if (apiResponse.code() == 401){
                 ApiCallErrorHandler.Error("Unauthorized")
             }
+            else if (apiResponse.code() == 404){
+                ApiCallErrorHandler.Error("Address  broken or invalid address")
+            }
             else{
                 ApiCallErrorHandler.Error(apiResponse.message())
             }

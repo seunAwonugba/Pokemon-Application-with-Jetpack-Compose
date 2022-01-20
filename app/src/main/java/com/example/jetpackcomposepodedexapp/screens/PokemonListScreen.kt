@@ -12,6 +12,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
@@ -19,8 +20,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -30,8 +31,6 @@ import androidx.navigation.NavController
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
-import coil.request.ImageRequest
-import coil.transform.CircleCropTransformation
 import com.example.jetpackcomposepodedexapp.R
 import com.example.jetpackcomposepodedexapp.Screens
 import com.example.jetpackcomposepodedexapp.dataclass.PokemonListEntry
@@ -138,11 +137,27 @@ fun PokemonList(
             //detect when to paginate
             //if this is true, we know we have scrolled to the bottom, also check if end is not reached
             if (it >= itemCount - 1 && !endReached) {
-                viewModel.loadingHandler()
+                viewModel.paginationLoadingHandler()
 
             }
             PokemonInRow(rowIndex = it, entries = pokemonList, navController = navController )
         }
+    }
+    
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Center
+    ) {
+        if (isLoading){
+            CircularProgressIndicator(color = MaterialTheme.colors.primary)
+        }
+        if (loadError.isNotEmpty()){
+            Retry(error = loadError) {
+                viewModel.paginationLoadingHandler()
+            }
+        }
+
+
     }
 }
 
@@ -215,29 +230,6 @@ fun SinglePokemon(
                     modifier = Modifier.scale(.5f)
                 )
             }
-//
-//            CoilImage(
-//                data = ImageRequest.Builder(LocalContext.current)
-//                    .data(pokemonListEntry.pokemonImageUrl)
-//                    .target{
-//                        viewModel.calculateDominantColor(it){ calculatedDominantColor ->
-//                            dominantColor = calculatedDominantColor
-//
-//                        }
-//                    }
-//                    .build(),
-//                contentDescription = pokemonListEntry.pokemonName,
-//                fadeIn = true,
-//                modifier = Modifier
-//                    .size(120.dp)
-//                    .align(CenterHorizontally)
-//            ) {
-//                //here is used to display a composable while its loading
-//                CircularProgressIndicator(
-//                    color = MaterialTheme.colors.primary,
-//                    modifier = Modifier.scale(.5f)
-//                )
-//            }
 
 
             //below image, display image name
@@ -282,5 +274,21 @@ fun PokemonInRow(
 
         }
         Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+//in case of error, retry loading the pokemon
+@Composable
+fun Retry(
+    error : String,
+    onRetry : () -> Unit
+){
+    Column {
+        Text(text = error, color = Color.Red, fontSize = 18.sp)
+        Spacer(modifier = Modifier.height(8.dp))
+        Button(onClick = { onRetry() }, modifier = Modifier.align(CenterHorizontally)) {
+            Text(text = "Retry")
+            
+        }
     }
 }
