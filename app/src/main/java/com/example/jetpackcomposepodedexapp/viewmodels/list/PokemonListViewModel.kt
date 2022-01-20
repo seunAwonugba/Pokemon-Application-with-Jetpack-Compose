@@ -13,6 +13,7 @@ import com.example.jetpackcomposepodedexapp.dataclass.PokemonListEntry
 import com.example.jetpackcomposepodedexapp.repository.TestRepository
 import com.example.jetpackcomposepodedexapp.utils.ApiCallErrorHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
@@ -49,8 +50,56 @@ class PokemonListViewModel @Inject constructor(
     var isLoading = mutableStateOf(false)
     var endReached = mutableStateOf(false)
 
+    //implement searching
+    //before we start the search save pokemonList inside cachedPokemonList, so that after the
+    //search we can then collect our list back from the cachedPokemonList
+    private var cachedPokemonList = listOf<PokemonListEntry>()
+    //used to inform us when searching wants to start so we can save pokemonList inside cachedPokemonList
+    private var isSearchStarting = true
+    //this is true as long as search results are being displayed
+    var isSearching = mutableStateOf(false)
+
     init {
         paginationLoadingHandler()
+    }
+
+    fun searchPokemonList(searchQuery : String){
+        //first thing first, lets determine the list of pokemon we want to search in
+        //originally before search occurs, we search in pokemonList, the moment searching occurs
+        //we transfer our list to the cachedPokemonList then boom, we want to start searching in the
+        //cachedPokemonList
+        val listToSearch = if(isSearchStarting){
+            pokemonList.value
+        }else{
+            cachedPokemonList
+        }
+
+        //Dispatchers.Default is good for cpu actions just like IO is goo for input and output actions
+        viewModelScope.launch(Dispatchers.Default) {
+            //now lets say i start searching, then i clear search field, what happens
+            //simply collect your list back from the cachedPokemonList
+            if (searchQuery.isEmpty()){
+                pokemonList.value = cachedPokemonList
+                //i'm not searching again
+                isSearching.value = false
+                //i can still start a search again, but presently i no day search
+                isSearchStarting = true
+                return@launch
+            }
+            //now lets say searchQuery is not now empty i.e texts inside search view
+            val searchResults = listToSearch.filter {
+                it.pokemonName.contains(searchQuery.trim(), ignoreCase = true) ||
+                        it.pokemonNumber.toString() == searchQuery.trim()
+            }
+            //the very moment i begin to search, cache the pokemon list
+            if (isSearchStarting){
+                cachedPokemonList = pokemonList.value
+                isSearchStarting = false
+            }
+            //finally we set our pokemon list to our search value
+            pokemonList.value = searchResults
+            isSearching.value = true
+        }
     }
 
     //loads next set of data while making a network call

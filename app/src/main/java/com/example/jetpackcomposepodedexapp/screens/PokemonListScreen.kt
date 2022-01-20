@@ -36,9 +36,11 @@ import com.example.jetpackcomposepodedexapp.Screens
 import com.example.jetpackcomposepodedexapp.dataclass.PokemonListEntry
 import com.example.jetpackcomposepodedexapp.viewmodels.list.PokemonListViewModel
 
+@ExperimentalCoilApi
 @Composable
 fun PokemonListScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel : PokemonListViewModel = hiltViewModel()
 ){
     //surface serves as root element of a screen, just like body tag
     Surface(
@@ -56,7 +58,10 @@ fun PokemonListScreen(
                     .align(CenterHorizontally),
             )
             //searchbar
-            SearchBar()
+            SearchBar(){
+                viewModel.searchPokemonList(it)
+
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -103,6 +108,7 @@ fun SearchBar(
     }
 }
 
+@ExperimentalCoilApi
 @Composable
 fun PokemonList(
     navController: NavController,
@@ -125,6 +131,10 @@ fun PokemonList(
         viewModel.loadError
     }
 
+    val isSearching by remember {
+        viewModel.isSearching
+    }
+
     LazyColumn(contentPadding = PaddingValues(16.dp)){
         val itemCount = if (pokemonList.size % 2 == 0) {
             pokemonList.size / 2
@@ -136,7 +146,8 @@ fun PokemonList(
         items(itemCount){
             //detect when to paginate
             //if this is true, we know we have scrolled to the bottom, also check if end is not reached
-            if (it >= itemCount - 1 && !endReached && !isLoading) {
+            //if we are paginating, then we are not searching
+            if (it >= itemCount - 1 && !endReached && !isLoading && !isSearching) {
                 viewModel.paginationLoadingHandler()
 
             }
