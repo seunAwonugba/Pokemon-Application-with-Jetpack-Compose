@@ -136,7 +136,7 @@ fun PokemonList(
         items(itemCount){
             //detect when to paginate
             //if this is true, we know we have scrolled to the bottom, also check if end is not reached
-            if (it >= itemCount - 1 && !endReached) {
+            if (it >= itemCount - 1 && !endReached && !isLoading) {
                 viewModel.paginationLoadingHandler()
 
             }
