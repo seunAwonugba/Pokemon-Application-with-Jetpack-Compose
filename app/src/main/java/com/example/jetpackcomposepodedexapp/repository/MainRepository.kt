@@ -1,5 +1,6 @@
 package com.example.jetpackcomposepodedexapp.repository
 
+import android.util.Log
 import com.example.jetpackcomposepodedexapp.api.ApiService
 import com.example.jetpackcomposepodedexapp.dataclass.details.PokemonDetailsDataClass
 import com.example.jetpackcomposepodedexapp.dataclass.list.PokemonListDataClass
@@ -9,7 +10,7 @@ import javax.inject.Inject
 class MainRepository @Inject constructor(
     private val api : ApiService
 ) : TestRepository {
-    override suspend fun pokemonList(
+    override suspend fun getPokemonList(
         limit: Int,
         offset: Int
     ): ApiCallErrorHandler<PokemonListDataClass> {
@@ -37,10 +38,12 @@ class MainRepository @Inject constructor(
         }
     }
 
-    override suspend fun pokemonDetails(name: String): ApiCallErrorHandler<PokemonDetailsDataClass> {
+    override suspend fun getPokemonDetails(pokemonName: String): ApiCallErrorHandler<PokemonDetailsDataClass> {
         return try {
-            val apiResponse = api.getPokemonDetails(name)
+            val apiResponse = api.getPokemonDetails(pokemonName)
             val apiResult = apiResponse.body()
+            Log.e("REPO_DATA", apiResult.toString())
+
 
             if (apiResponse.isSuccessful && apiResult != null) {
                 ApiCallErrorHandler.Success(apiResult)

@@ -60,7 +60,7 @@ class PokemonListViewModel @Inject constructor(
     var isSearching = mutableStateOf(false)
 
     init {
-        paginationLoadingHandler()
+        fetchPokemonListWithPaginationImplemented()
     }
 
     fun searchPokemonList(searchQuery : String){
@@ -103,12 +103,12 @@ class PokemonListViewModel @Inject constructor(
     }
 
     //loads next set of data while making a network call
-    fun paginationLoadingHandler(){
+    fun fetchPokemonListWithPaginationImplemented(){
         viewModelScope.launch {
             // before setting result emit loading state
             isLoading.value = true
             //load pokemon, how many do u want to load, PAGE_SIZE, from where do u want to load from, that the offset
-            var result = repository.pokemonList(PAGE_SIZE, currentPage * PAGE_SIZE)
+            val result = repository.getPokemonList(PAGE_SIZE, currentPage * PAGE_SIZE)
 
             when(result){
                 is ApiCallErrorHandler.Success -> {
@@ -154,6 +154,7 @@ class PokemonListViewModel @Inject constructor(
                     isLoading.value = false
 
                 }
+                else -> {}
             }
         }
 

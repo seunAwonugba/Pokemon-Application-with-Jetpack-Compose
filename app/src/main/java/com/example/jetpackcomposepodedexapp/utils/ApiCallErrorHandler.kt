@@ -9,5 +9,6 @@ sealed class ApiCallErrorHandler<T>(
     //when error, get the error message
     class Error<T>(message: String) : ApiCallErrorHandler<T>(null, message)
 
+    //passes default null
     class Loading<T> : ApiCallErrorHandler<T>()
 }

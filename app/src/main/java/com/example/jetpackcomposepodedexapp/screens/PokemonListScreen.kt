@@ -5,14 +5,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
@@ -95,7 +93,7 @@ fun SearchBar(
             singleLine = true,
             modifier = Modifier
                 .fillMaxWidth(),
-            shape = CircleShape,
+            shape = RoundedCornerShape(8.dp),
             trailingIcon = {
                 IconButton(onClick = { /*TODO*/ }) {
                     Icons.Filled.Search
@@ -148,7 +146,7 @@ fun PokemonList(
             //if this is true, we know we have scrolled to the bottom, also check if end is not reached
             //if we are paginating, then we are not searching
             if (it >= itemCount - 1 && !endReached && !isLoading && !isSearching) {
-                viewModel.paginationLoadingHandler()
+                viewModel.fetchPokemonListWithPaginationImplemented()
 
             }
             PokemonInRow(rowIndex = it, entries = pokemonList, navController = navController )
@@ -164,7 +162,7 @@ fun PokemonList(
         }
         if (loadError.isNotEmpty()){
             Retry(error = loadError) {
-                viewModel.paginationLoadingHandler()
+                viewModel.fetchPokemonListWithPaginationImplemented()
             }
         }
 
@@ -303,3 +301,4 @@ fun Retry(
         }
     }
 }
+

@@ -8,8 +8,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import coil.annotation.ExperimentalCoilApi
 import com.example.jetpackcomposepodedexapp.screens.PokemonListScreen
 
+@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun Navigation() {
     //You can create a NavController by using the rememberNavController() method in your composable:
@@ -19,7 +21,6 @@ fun Navigation() {
     NavHost(navController = navController, startDestination = Screens.PokemonListScreen.route){
         composable(Screens.PokemonListScreen.route){
             PokemonListScreen(navController = navController)
-
         }
         composable(
             Screens.PokemonDetailsScreen.route + "/{dominantColor}" + "/{pokemonName}" ,
