@@ -14,7 +14,6 @@ class PokemonDetailsViewModel @Inject constructor(
 
    suspend fun fetchPokemonDetails(pokemonName : String) : ApiCallErrorHandler<PokemonDetailsDataClass>{
        return repository.getPokemonDetails(pokemonName)
-
    }
 
 }

@@ -42,8 +42,6 @@ class MainRepository @Inject constructor(
         return try {
             val apiResponse = api.getPokemonDetails(pokemonName)
             val apiResult = apiResponse.body()
-            Log.e("REPO_DATA", apiResult.toString())
-
 
             if (apiResponse.isSuccessful && apiResult != null) {
                 ApiCallErrorHandler.Success(apiResult)

@@ -3,13 +3,16 @@ package com.example.jetpackcomposepodedexapp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.toLowerCase
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import coil.annotation.ExperimentalCoilApi
+import com.example.jetpackcomposepodedexapp.screens.PokemonDetailsScreen
 import com.example.jetpackcomposepodedexapp.screens.PokemonListScreen
+import java.util.*
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
@@ -48,6 +51,11 @@ fun Navigation() {
             val pokemonName = remember {
                 it.arguments?.getString("pokemonName")
             }
+            PokemonDetailsScreen(
+                dominantColor = dominantColor,
+                pokemonName = pokemonName.toString().lowercase(Locale.ROOT),
+                navController = navController
+            )
         }
 
     }
